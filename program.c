@@ -1,6 +1,7 @@
 #include<stdio.h>
 
 float metodeLiebmann(int platKiri, int platKanan, int platAtas, int platBawah, float lamda, float es);
+float metodeExplicit(float k, int jumlahT, int Tawal, int Takhir, float panjangX, int Troad, float deltaX, float deltaT);
 
 int main(void){
 
@@ -15,6 +16,15 @@ int main(void){
     int platBawah;
     float lamda;
     float es;
+    
+    //Input Metode Explicit & Implicit
+    int jumlahT;
+    int Tawal;
+    int Takhir;
+    int Troad;
+    float panjangX;
+    float deltaX;
+    float deltaT;
     
      printf("***********************************************\n");
     printf("Program PDE dengan FDM (elliptic & parabolic) \n");
@@ -151,3 +161,39 @@ float metodeLiebmann(int platKiri, int platKanan, int platAtas, int platBawah, f
         }
     }
 }
+
+float metodeExplicit(float k, int jumlahT, int Tawal, int Takhir, float panjangX, int Troad, float deltaX, float deltaT){
+    float lamda;
+    int node;
+    int iterasi;
+
+    lamda = k*deltaT/(deltaX*deltaX);
+    node = (panjangX-0)/deltaX;
+    iterasi = (jumlahT-0)/deltaT;
+
+    float T[iterasi][node];
+
+    printf("|=========================================================================|\n");
+    printf("| Iterasi Ke-       |   T0  |   T1  |   T2  |   T3  |   T4  |   T5  |\n");
+    printf("|=========================================================================|");
+    
+    //Rumus Metode Explicit : Ti,j+1 = Ti,j +lamda(Ti+1,j-2Ti,j+Ti-i,j)
+    for(int j = 0; j < iterasi; j++ ){
+        for(int i = 1; i <= node; i++ ){
+            T[j][0] = Tawal;
+            T[0][i] = Troad;
+            T[j][node] = Takhir;
+            
+            T[j+1][i] = T[j][i] + lamda*(T[j][i+1]-2*T[j][i]+T[j][i-1]);
+        }
+        printf("\n| %d      |   %f  |   %f  |   %f  |   %f  |   %f  |   %f  |", j,T[j][0],T[j][1],T[j][2],T[j][3],T[j][4],T[j][5]);
+        printf("\n");
+    }
+
+    printf("Hasilnya adalah : \n");
+    for(int b = 1;b <node; b++){
+        printf("T[2][%d] : %f", b,T[2][b] );
+        printf("\n");
+    }
+}
+
