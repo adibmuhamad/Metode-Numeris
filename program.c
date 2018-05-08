@@ -2,6 +2,7 @@
 
 float metodeLiebmann(int platKiri, int platKanan, int platAtas, int platBawah, float lamda, float es);
 float metodeExplicit(float k, int jumlahT, int Tawal, int Takhir, float panjangX, int Troad, float deltaX, float deltaT);
+float metodeImplicit(float k, int jumlahT, int Tawal, int Takhir, float panjangX, int Troad, float deltaX, float deltaT);
 
 int main(void){
 
@@ -197,3 +198,102 @@ float metodeExplicit(float k, int jumlahT, int Tawal, int Takhir, float panjangX
     }
 }
 
+float metodeImplicit(float k, int jumlahT, int Tawal, int Takhir, float panjangX, int Troad, float deltaX, float deltaT){
+    float lamda;
+    int node;
+    int iterasi;
+    
+    lamda = k*deltaT/(deltaX*deltaX);
+    node = (panjangX-0)/deltaX;
+    iterasi = (jumlahT-0)/deltaT;
+  
+    
+    float T[iterasi][node+1];
+  
+    float A[5][5];
+
+    float c;
+    float x[6];
+    float sum=0.0;
+
+    for(int j = 0; j < iterasi; j++ ){
+        for(int i = 1; i <node; i++ ){
+            T[j][0] = Tawal;
+            T[0][i] = Troad;
+            T[j][node] = Takhir;
+            
+        }
+        
+    }
+    for(int z = 0; z < iterasi; z++ ){
+        
+            A[1][1] = 1+(2*lamda);
+            A[1][2] = -lamda;
+            A[1][3] = 0;
+            A[1][4] = 0;
+            A[1][5] = T[z][1]-((-lamda)*T[z+1][0]);
+
+            A[2][1] = -lamda;
+            A[2][2] = 1+(2*lamda);
+            A[2][3] = -lamda;
+            A[2][4] = 0;
+            A[2][5] = T[z][2];
+
+            A[3][1] = 0;
+            A[3][2] = -lamda;
+            A[3][3] = 1+(2*lamda);
+            A[3][4] = -lamda;
+            A[3][5] = T[z][3];
+
+            A[4][1] = 0;
+            A[4][2] = 0;
+            A[4][3] = -lamda;
+            A[4][4] = 1+(2*lamda);
+            A[4][5] = T[z][1]-((-lamda)*T[z+1][5]);
+
+            
+            
+        //Eliminasi Gauss
+        //Looping untuk menghasilkan matriks segitiga
+        for(int j=1; j<=4; j++) 
+        {
+            for(int i=1; i<=4; i++)
+            {
+                if(i>j)
+                {
+                    c=A[i][j]/A[j][j];
+                    for(int k=1; k<=5; k++)
+                    {
+                        A[i][k]=A[i][k]-c*A[j][k];
+                    }
+                }
+            }
+        }
+        
+        x[4]=A[4][5]/A[4][4];
+        /* Looping untuk backward substitution*/
+        for(int i=3; i>=1; i--)
+        {
+            sum=0;
+            for(int j=i+1; j<=4; j++)
+            {
+                sum=sum+A[i][j]*x[j];
+            }
+            x[i]=(A[i][5]-sum)/A[i][i];
+            
+            
+        }
+        printf("Iterasi ke %d \n", z+1);
+        for(int i = 1; i <=4; i++){
+            T[z+1][i] = x[i];
+        }
+        
+        for(int i=0; i<=5; i++)
+        {
+            x[0] = Tawal;
+            x[node] = Takhir;
+            printf("T[%d] : %f \n",i,x[i]); 
+            
+        }
+    }
+}
